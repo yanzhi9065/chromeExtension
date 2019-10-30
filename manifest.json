@@ -1,0 +1,24 @@
+{
+  "name": "Forma Outfit Hunter",
+  "version": "0.1",
+  "description": "Replace every image with Pikachu images.",
+  "manifest_version": 2,
+  "icons": {
+    "16": "assets/images/icon.png",
+    "32": "assets/images/icon.png",
+    "48": "assets/images/icon.png",
+    "128": "assets/images/icon.png"
+  },
+  "content_scripts": [{
+    "matches": ["<all_urls>"],
+    "all_frames": true,
+    "js":      ["assets/js/contentScript.js"]
+  }],
+  "background": {
+    "scripts": ["assets/js/background.js"],
+    "persistent": false
+  },
+  "permissions": [
+    "//https://some-random-api.ml/*"
+  ]
+}
