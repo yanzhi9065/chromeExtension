@@ -19,6 +19,11 @@
     "persistent": false
   },
   "permissions": [
-    "//https://some-random-api.ml/*"
-  ]
+    "cookies",
+    "https://test.tryforma.com/*"
+  ],
+  "browser_action": {
+    "popup": "assets/html/popup.html",
+    "default_icon":"assets/images/icon.png"
+  }
 }
