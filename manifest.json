@@ -20,10 +20,12 @@
   },
   "permissions": [
     "cookies",
-    "https://test.tryforma.com/*"
+    "contextMenus",
+    "storage",
+    "https://app.tryforma.com/*"
   ],
   "browser_action": {
-    "popup": "assets/html/popup.html",
+    "default_popup": "assets/html/popup.html",
     "default_icon":"assets/images/icon.png"
   }
 }
