@@ -10,5 +10,5 @@ function checkImages(images) {
   }
 }
 
-let images = document.getElementsByTagName('img');
-checkImages(images)
+// let images = document.getElementsByTagName('img');
+// checkImages(images)

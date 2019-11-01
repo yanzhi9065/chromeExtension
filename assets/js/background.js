@@ -11,7 +11,10 @@ chrome.contextMenus.create({
 chrome.contextMenus.onClicked.addListener((info) => {
   if(info.menuItemId === "OutfitImageGrabber") {
     let imgsrc = info.srcUrl
-    console.log("menu info:", info)
+    console.log("image src:", info.srcUrl)
+    let userInfo = chrome.storage.local.get(['userInfo'], (info) => {
+      console.log("userInfo:", info)
+    })
   }
 })
 
@@ -37,8 +40,8 @@ chrome.runtime.onMessage.addListener(function(message, sender, cb){
 function loadUserInfo(cb) {
   chrome.storage.local.get(['userInfo'], result => {
     console.log("result from background:", result)
-    if(result.username)
-      cb(result)
+    if(result.userInfo.username)
+      cb(result.userInfo)
     else {
       console.log("no storage, check cookie")
       chrome.cookies.get({url:"https://app.tryforma.com", name:"token"}, (cookie) => {
