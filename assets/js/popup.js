@@ -85,9 +85,10 @@ function login(event) {
       setCookie("token", res.data.key+"&&"+res.data.uuid)
       document.body.appendChild(createHelper(res.data))
     }
-    else
+    else {
       alert(res.msg)
       console.log("login failed")
+    }
   });
 }
 
