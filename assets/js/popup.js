@@ -4,17 +4,21 @@ console.log("try to loading userInfo")
 let form = undefined
 let helper = undefined
 
-chrome.runtime.sendMessage({msg: 'loadUserInfo'}, function cb(res) {
-  console.log("reviced userInfo:", res)
-  let node = null;
-  if(res && (res.useruuid||res.uuid)) {
-    node = createHelper(res)
-  }
-  else
-    node = createLogin()
+init();
 
-  document.body.appendChild(node)
-})
+function init() {
+  chrome.runtime.sendMessage({msg: 'loadUserInfo'}, function cb(res) {
+    console.log("reviced userInfo:", res)
+    let node = null;
+    if(res && (res.useruuid||res.uuid)) {
+      node = createHelper(res)
+    }
+    else
+      node = createLogin()
+
+    document.body.appendChild(node)
+  })
+}
 
 function createLogin() {
   form = document.createElement("form")
@@ -66,8 +70,12 @@ function createHelper(data) {
   label.innerText = "Right click on the image of the outfit you want to tryon and wait for the magic to happen."
   line2.appendChild(label)
 
+  let btn = document.createElement('button')
+  btn.addEventListener('click', logout)
+  btn.innerText="Logout"
   helper.appendChild(line1)
   helper.appendChild(line2)
+  helper.append(btn)
   return helper
 }
 
@@ -81,15 +89,23 @@ function login(event) {
     if(res.isLogin) {
       console.log("login Success:", res)
       document.body.removeChild(form)
-      chrome.storage.local.set({userInfo:res.data})
+      //chrome.storage.local.set({userInfo:res.data})
       setCookie("token", res.data.key+"&&"+res.data.uuid)
-      document.body.appendChild(createHelper(res.data))
+      //document.body.appendChild(createHelper(res.data))
+      init()
     }
     else {
       alert(res.msg)
       console.log("login failed")
     }
   });
+}
+
+function logout() {
+  chrome.cookies.remove({url:"https://sicoal.isabq.com", name:"token"})
+  chrome.storage.local.clear()
+  document.body.remove(helper)
+  document.body.appendChild(form)
 }
 
 function setCookie(key, value) {

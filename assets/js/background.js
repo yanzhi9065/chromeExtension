@@ -1,6 +1,7 @@
 console.log("background js loaded")
 
 let userkey = "";
+let avatarUUIDs = [];
 
 const PROCESSED = "processed";
 const FAILED = "processing_failed";
@@ -19,9 +20,28 @@ chrome.contextMenus.onClicked.addListener((info) => {
       let userInfo = res.userInfo
       console.log("userInfo:", userInfo)
       console.log("userkey:", userkey)
-      uploadWebItem(userInfo.uuid, userkey, imgsrc).then(res => {
-        console.log("item uploaded")
+      uploadWebItem(userInfo.uuid, userkey, imgsrc).then(async (res) => {
+        console.log("item uploaded:", res)
         alert("item uploaded");
+        try{
+          console.log("current avatarUUIDs:", avatarUUIDs)
+          if(!avatarUUIDs || avatarUUIDs.length === 0) {
+            console.log("loading avatar");
+            await loadAvatarList();
+            console.log("avatar loaded");
+          }
+          tryon(avatarUUIDs[0], res.itemUUID, userInfo.username, userkey)
+          .then(res => {
+            //{tryonUUID, url:res.media.main}
+            console.log("tryon success:", res);
+          }).catch(err => {
+            console.log("tryon failed:", err)
+          })
+        } catch(err) {
+          console.log("failed to tryon:", err)
+          alert("failed to do tryon")
+        }
+
       }).catch(err => {
         console.log("failed to upload item:", err)
         alert(err.msg)
@@ -60,14 +80,14 @@ function loadUserInfo(cb) {
 
       chrome.storage.local.get(['userInfo'], result => {
         console.log("result from background:", result)
-        if(result.userInfo.username) {
+        if(result.userInfo && result.userInfo.username) {
           console.log("found cache in storage, use this");
           cb(result.userInfo)
         }
         else {
           console.log("no cache, getting user info");
           fetch("https://social.isabq.com/api/v1/users/"+uuid+"/",{
-            method: "POST",
+            method: "GET",
             headers: {
               "user-agent": "Mozilla/4.0 berners",
               "content-type": "application/json",
@@ -76,7 +96,7 @@ function loadUserInfo(cb) {
             },
           })
           .then(res => res.json())
-          .then(body => {
+          .then(async (body) => {
             console.log("res:", body)
             if(body.username) {
               console.log("get username:", body.username)
@@ -96,6 +116,32 @@ function loadUserInfo(cb) {
       console.log("no session, no cookie, login again");
       cb(null)
     }
+  })
+}
+
+function loadAvatarList() {
+  return new Promise((resolve, reject) => {
+    fetch("https://social.isabq.com/api/v1/avatars/",{
+      method: "GET",
+      headers: {
+        "user-agent": "Mozilla/4.0 berners",
+        "content-type": "application/json",
+        accept: "application/json",
+        Authorization: "Token " + userkey
+      },
+    })
+    .then(res => res.json())
+    .then(body => {
+      console.log("res:", body)
+      if(body.results) {
+        avatarUUIDs = body.results.map(item => (item.uuid))
+        console.log("get avatars:", avatarUUIDs) 
+        resolve();
+      }
+    }).catch(err => {
+      console.log("failed to get userInfo:", err)
+      reject(err);
+    });
   })
 }
 
@@ -128,10 +174,6 @@ function handleLogin({username, password}, cb) {
     console.log("login failed:", err);
     cb({isLogin:false, msg:"connection failed"});
   })
-}
-
-function handleMenuClick(event) {
-  console.log(event)
 }
 
 function getSignedUrl(username, key, type, itemUUID) {
@@ -213,9 +255,9 @@ async function checkItemStatus(itemUUID, key) {
   }
 }
 
-async function checkItemStatus(itemUUID, key) {
+async function checkTryonStatus(tryonUUID, key) {
   try{
-    let res = await fetchItemStatus(itemUUID, key, 'items');
+    let res = await fetchItemStatus(tryonUUID, key, 'tryons');
     return res;
   } catch(err) {
     return null;
@@ -282,6 +324,7 @@ function uploadWebItem(userId, key, imageURL) {
 }
 
 function tryon(avatarUUID, itemUUID, username, key) {
+  console.log("tyron input:", avatarUUIDs, itemUUID, username, userkey)
   const URL = `${getBaseApiUrl()}/api/v1/tryons/async/?source=` + username;
   const data = {
     avatars: [{uuid: avatarUUID}],
