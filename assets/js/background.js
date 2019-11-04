@@ -6,20 +6,24 @@ let avatarUUIDs = [];
 const PROCESSED = "processed";
 const FAILED = "processing_failed";
 
-chrome.contextMenus.create({ 
-  id: 'OutfitImageGrabber',
-  title: 'Grab this outfit!',
-  contexts: ['image'],
+chrome.runtime.onInstalled.addListener(function() {
+  chrome.contextMenus.create({ 
+    id: 'OutfitImageGrabber',
+    title: 'Grab this outfit!',
+    contexts: ['image'],
+  });
 });
 
-chrome.contextMenus.onClicked.addListener((info) => {
+chrome.contextMenus.onClicked.addListener((info, tab) => {
   if(info.menuItemId === "OutfitImageGrabber") {
     let imgsrc = info.srcUrl
+    console.log("event info:", info, tab)
     console.log("image src:", info.srcUrl)
     chrome.storage.local.get(['userInfo'], (res) => {
       let userInfo = res.userInfo
       console.log("userInfo:", userInfo)
       console.log("userkey:", userkey)
+      chrome.tabs.executeScript(tab.tabId, {file:"grabbingUI.js"})
       uploadWebItem(userInfo.uuid, userkey, imgsrc).then(async (res) => {
         console.log("item uploaded:", res)
         alert("item uploaded");
@@ -30,9 +34,15 @@ chrome.contextMenus.onClicked.addListener((info) => {
             await loadAvatarList();
             console.log("avatar loaded");
           }
+          chrome.tabs.executeScript(tab.tabId, {file:"bakingUI.js"})
           tryon(avatarUUIDs[0], res.itemUUID, userInfo.username, userkey)
           .then(res => {
             //{tryonUUID, url:res.media.main}
+            chrome.tabs.executeScript(tab.tabId, {
+              code:"var tryOnURL="+res.media.main
+            }, () => {
+              chrome.tabs.executeScript(tab.tabId, {file:"diplayUI.js"})
+            });
             console.log("tryon success:", res);
           }).catch(err => {
             console.log("tryon failed:", err)
@@ -41,7 +51,6 @@ chrome.contextMenus.onClicked.addListener((info) => {
           console.log("failed to tryon:", err)
           alert("failed to do tryon")
         }
-
       }).catch(err => {
         console.log("failed to upload item:", err)
         alert(err.msg)
