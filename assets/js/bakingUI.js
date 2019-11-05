@@ -1,0 +1,1 @@
+text.innerHTML="dressing your avatar..."
