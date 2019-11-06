@@ -25,8 +25,8 @@ wrapperDiv.appendChild(iframeElement);
 
 modalDialogParentDiv = document.createElement("div");
 modalDialogParentDiv.id = "tryformaDialog"
-modalDialogParentDiv.setAttribute("style","display:none; position: absolute; width: 350px; border: 1px solid rgb(51, 102, 153); padding: 10px; background-color: rgb(255, 255, 255); z-index: 2001; overflow: auto; text-align: center; top: 149px; left: 497px;");
-//modalDialogParentDiv.setAttribute("style","position: fixed; width: 350px; border: 1px solid rgb(51, 102, 153); padding: 10px; background-color: rgb(255, 255, 255); z-index: 2001; overflow: auto; text-align: center; top: 280px; left: calc(50% - 175px);");
+modalDialogParentDiv.setAttribute("style","display:none; position: fixed; width: 400px; border: 1px solid rgb(51, 102, 153); padding: 10px; background-color: rgb(255, 255, 255); z-index: 2001; overflow: auto; text-align: center; top: 200px; left: calc(50% - 200px);");
+//modalDialogParentDiv.setAttribute("style","position: fixed; width: 400px; border: 1px solid rgb(51, 102, 153); padding: 10px; background-color: rgb(255, 255, 255); z-index: 2001; overflow: auto; text-align: center; top: 280px; left: calc(50% - 200px);");
 
 modalDialogSiblingDiv = document.createElement("div");
 
@@ -65,7 +65,7 @@ modalDialogImageDiv.id="dialogImageDiv";
 
 tryonImage =  document.createElement("img");
 tryonImage.id="tryonImage";
-tryonImage.style="width:200, height:350";
+tryonImage.style="width:375px;height:500px;";
 
 modalDialogImageDiv.appendChild(tryonImage)
 

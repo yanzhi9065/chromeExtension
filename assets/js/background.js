@@ -25,7 +25,7 @@ function test(tab) {
     chrome.tabs.executeScript(tab.tabId, {file:"assets/js/bakingUI.js"})
     setTimeout(() => {
       chrome.tabs.executeScript(tab.tabId, {
-        code:"tryOnURL='https://i.pinimg.com/originals/f3/e1/b8/f3e1b8019f160f88531d8af792716b4f.png';"
+        code:"tryOnURL='https://s3-us-west-2.amazonaws.com/formatech-public/659739e1-22d9-4f27-b2c3-78876bec6c2e.jpg';"
       }, function() {
         chrome.tabs.executeScript(tab.tabId, {file:"assets/js/displayUI.js"})
       });
